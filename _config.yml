@@ -17,7 +17,7 @@ lang: en-US
 title: ClearWater Analytica
 email: info@clrwater.io
 description: "ClearWater Analytica: HAB reports for Woodcliff Lake"
-baseurl: nj_woodcliff_reports/  # the subpath of your site, e.g. /blog
+baseurl: nj_tappan_reports/  # the subpath of your site, e.g. /blog
 url: https://ClearWaterAnalytica.github.io/ # the base hostname & protocol for your site, e.g. http://example.com
 author:
   name: James Watson
