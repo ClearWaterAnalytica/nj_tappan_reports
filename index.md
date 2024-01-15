@@ -1,13 +1,13 @@
 ---
 title: "Jan 15, 2024"
 excerpt: "HAB update"
-image: /assets/images/woodcliff.jpg
+image: /assets/images/tappan.jpg
 tags: 
   - hab
   - prediction
 ---
 
-Click here to see the live and interactive [Harmful Algal Bloom dashboard](https://woodcliff.clrwater.io/).
+Click here to see the live and interactive [Harmful Algal Bloom dashboard](https://tappan.clrwater.io/).
 
 ## 7-day Look Ahead Bloom Forecast
 Below are pie charts describing the __probability of a cyanobacterial bloom__. The chart on the left describes the predictions from two weeks ago, and the one on the right describes the latest prediction, for the coming week. 
