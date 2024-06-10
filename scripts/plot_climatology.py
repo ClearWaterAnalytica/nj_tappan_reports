@@ -5,16 +5,25 @@ import matplotlib.cm as cm
 from datetime import date
 import pandas as pd
 import runpy
+import botocore.session
+import s3fs
+
+session = botocore.session.get_session()
+AWS_SECRET = session.get_credentials().secret_key
+AWS_ACCESS_KEY = session.get_credentials().access_key 
+
+s3 = s3fs.S3FileSystem(anon=False, key=AWS_ACCESS_KEY, secret=AWS_SECRET)
+
 today = date.today()
-
-
 
 ######## Climatology for long-term forecast
 ## Data
-path = "/tmp/nj_lake_tappan_dashboard/proc_dashboard_data/"
-pwd = path+"now_cast_tab/"
+# path = "/tmp/nj_lake_tappan_dashboard/proc_dashboard_data/"
+# pwd = path+"now_cast_tab/"
 #data = pd.read_csv(pwd + "or_detroit_lake_nowcast_expected_longrun_predictions.csv",parse_dates=["date"])
-data = pd.read_csv(pwd + "nj_lake_tappan_nowcast_predictions_longrun_detect.csv",parse_dates=["date"])
+# data = pd.read_csv(pwd + "nj_lake_tappan_nowcast_predictions_longrun_detect.csv",parse_dates=["date"])
+
+data = pd.read_csv(f"s3://cwa-assets/nj_lake_tappan/assets/now_cast_tab/nj_lake_tappan_nowcast_predictions_longrun_detect.csv",parse_dates=["date"])
 
 
 data["month"] = data["date"].dt.month

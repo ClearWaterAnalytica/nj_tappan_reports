@@ -17,6 +17,15 @@ import os
 
 from pydoc import importfile
 
+import botocore.session
+import s3fs
+
+session = botocore.session.get_session()
+AWS_SECRET = session.get_credentials().secret_key
+AWS_ACCESS_KEY = session.get_credentials().access_key 
+
+s3 = s3fs.S3FileSystem(anon=False, key=AWS_ACCESS_KEY, secret=AWS_SECRET)
+
 username =  os.environ.get('USER')
 
 mapbox = importfile(f"/home/{username}/.mapbox/credentials")
@@ -26,8 +35,8 @@ MAPBOX_KEY = mapbox.mapbox_id
 ################ SATELLITE CHL-A ####################
 #path = "./Data/or_detroit_lake_dashboard/proc_dashboard_data/"
 #path = "./Data/tx_cedar_creek_reservoir_dashboard/proc_dashboard_data/"
-path = "/tmp/nj_lake_tappan_dashboard/proc_dashboard_data/"
-files = sorted(glob.glob(path+"cyan_map/*.csv"))
+# path = "/tmp/nj_lake_tappan_dashboard/proc_dashboard_data/"
+# files = sorted(glob.glob(path+"cyan_map/*.csv"))
 
 ##! find colorbounds
 #chl_min = [] 
@@ -40,8 +49,10 @@ files = sorted(glob.glob(path+"cyan_map/*.csv"))
 #chl_min = np.percentile(chl_min,5)
 #chl_max = np.percentile(chl_max,95)
 
+files = sorted(s3.glob(f"s3://cwa-assets/nj_lake_tappan/assets/cyan_map/*.csv"))
+
 #! Latest data
-data = pd.read_csv(files[-1],parse_dates=["date"])
+data = pd.read_csv(f"s3://{files[-1]}",parse_dates=["date"])
 data["month"] = data["date"].dt.month
 data["week"] = data["date"].dt.week
 data["year"] = data["date"].dt.year
@@ -56,7 +67,7 @@ allCyan = df["log_CI_cells_mL"].to_numpy().reshape((-1,1))
 
 # get lagged readings
 for i in np.arange(-X,-1):
-    df1 = pd.read_csv(files[i],parse_dates=["date"])
+    df1 = pd.read_csv(f"s3://{files[i]}",parse_dates=["date"])
     newCyan = griddata((df1["lon"],df1["lat"]), df1["log_CI_cells_mL"],(lons, lats), method='nearest').reshape((-1,1))
     allCyan = np.hstack([allCyan, newCyan])
 

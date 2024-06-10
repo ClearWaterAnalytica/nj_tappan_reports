@@ -15,6 +15,15 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from mpl_toolkits import axes_grid1
 
+import botocore.session
+import s3fs
+
+session = botocore.session.get_session()
+AWS_SECRET = session.get_credentials().secret_key
+AWS_ACCESS_KEY = session.get_credentials().access_key 
+
+s3 = s3fs.S3FileSystem(anon=False, key=AWS_ACCESS_KEY, secret=AWS_SECRET)
+
 def add_colorbar(im, aspect=20, pad_fraction=0.5, **kwargs):
     """Add a vertical color bar to an image plot."""
     divider = axes_grid1.make_axes_locatable(im.axes)
@@ -46,8 +55,8 @@ osm_img = cimgt.QuadtreeTiles() # spoofed, downloaded street map << Sat image
 
 ################ SATELLITE CHL-A ####################
 #path = "./Data/or_detroit_lake_dashboard/proc_dashboard_data/"
-path = "/tmp/nj_lake_tappan_dashboard/proc_dashboard_data/"
-files = sorted(glob.glob(path+"satellite_map/*.csv"))
+# path = "/tmp/nj_lake_tappan_dashboard/proc_dashboard_data/"
+# files = sorted(glob.glob(path+"satellite_map/*.csv"))
 
 ##! find colorbounds
 #chl_min = [] 
@@ -60,8 +69,10 @@ files = sorted(glob.glob(path+"satellite_map/*.csv"))
 #chl_min = np.percentile(chl_min,5)
 #chl_max = np.percentile(chl_max,95)
 
+files = sorted(s3.glob(f"s3://cwa-assets/nj_lake_tappan/assets/satellite_map/*.csv"))
+
 #! Latest data
-data = pd.read_csv(files[-1],parse_dates=["date"])
+data = pd.read_csv(f"s3://{files[-1]}",parse_dates=["date"])
 data["month"] = data["date"].dt.month
 data["week"] = data["date"].dt.week
 data["year"] = data["date"].dt.year
@@ -73,7 +84,7 @@ lons = data["lon"]
 lats = data["lat"]
 df = data.copy()
 for i in np.arange(-X,-1):
-    df1 = pd.read_csv(files[i],parse_dates=["date"])
+    df1 = pd.read_csv(f"s3://{files[i]}",parse_dates=["date"])
     df["Chlorophyll"] = (df["Chlorophyll"] + griddata((df1["lon"],df1["lat"]), df1["Chlorophyll"], 
             (lons, lats), method='nearest')) / 2
 

@@ -3,7 +3,7 @@ import pandas as pd
 import glob
 import matplotlib.pyplot as plt
 import seaborn as sns
-from datetime import date
+from datetime import date, datetime
 import botocore.session
 import s3fs
 
@@ -11,19 +11,23 @@ session = botocore.session.get_session()
 AWS_SECRET = session.get_credentials().secret_key
 AWS_ACCESS_KEY = session.get_credentials().access_key 
 
+s3 = s3fs.S3FileSystem(anon=False, key=AWS_ACCESS_KEY, secret=AWS_SECRET)
+
+today = date.today()
 today = date.today()
 current_year = datetime.now().year
-lake_name = "nj_lake_tappan"
+lake_name = "or_detroit_lake"
 
 lst_ = []
 for year_ in range(2010, current_year + 1):
-	print(year_)
-	df = pd.read_csv(f"s3://cwa-assets/{lake_name}/assets/weather_tab/{lake_name}_gridmet_{year_}.csv", parse_dates=["date"])
-	lst_.append(df)
+    print(year_)
+    df = pd.read_csv(f"s3://cwa-assets/{lake_name}/assets/weather_tab/{lake_name}_gridmet_{year_}.csv", parse_dates=["date"])
+    lst_.append(df)
 
 data = pd.concat(lst_)
-
 today = date.today()
+
+data = data.drop_duplicates().reset_index(drop=True)
 
 
 
