@@ -117,7 +117,7 @@ fig.update_layout(
     title_x=0.2,
     mapbox=dict(
         style="satellite",
-        zoom=12,  # Adjust this value to zoom out (lower values mean more zoomed out)
+        zoom=11,  # Adjust this value to zoom out (lower values mean more zoomed out)
         center=dict(lat=some_lat, lon=some_lon)  # Replace with the center of your data
     )
 )
